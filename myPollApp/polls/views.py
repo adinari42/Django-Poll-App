@@ -14,13 +14,6 @@ def index(request):
     return render(request, "polls/index.html", context)
 
 
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
-
-
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/results.html", {"question": question})
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -45,6 +38,14 @@ def vote(request, question_id):
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))#HttpResponseRedirect redirects the user to the url argument
         #reverse() helps construct the url easier using name of the view and view url variable
 
+
+def results(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, "polls/results.html", {"question": question})
+
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, "polls/detail.html", {"question": question})
+
+# def detail(request, question_id):
+#     return HttpResponse("You're looking at question %s." % question_id)
