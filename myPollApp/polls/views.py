@@ -3,17 +3,30 @@ from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.views import generic
 
 from .models import Choice, Question
 
 #Each view is responsible for doing one of two things: returning an HttpResponse object
-# containing the content for the requested page, or raising an exception such as Http404
-def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    context = {"latest_question_list": latest_question_list}
-    return render(request, "polls/index.html", context)
+#       containing the content for the requested page, or raising an exception such as Http404
+
+class IndexView(generic.ListView):
+    template_name = "polls/index.html"
+    context_object_name = "latest_question_list"
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.order_by("-pub_date")[:5]
 
 
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = "polls/detail.html"
+
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = "polls/results.html"
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -39,13 +52,19 @@ def vote(request, question_id):
         #reverse() helps construct the url easier using name of the view and view url variable
 
 
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/results.html", {"question": question})
 
-def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/detail.html", {"question": question})
+
+#common web dev way:
+
+# def index(request):
+#     latest_question_list = Question.objects.order_by("-pub_date")[:5]
+#     context = {"latest_question_list": latest_question_list}
+#     return render(request, "polls/index.html", context)#renders a template then returns ut
+
+# def results(request, question_id):
+#     question = get_object_or_404(Question, pk=question_id)
+#     return render(request, "polls/results.html", {"question": question})
 
 # def detail(request, question_id):
-#     return HttpResponse("You're looking at question %s." % question_id)
+#     question = get_object_or_404(Question, pk=question_id)
+#     return render(request, "polls/detail.html", {"question": question})
